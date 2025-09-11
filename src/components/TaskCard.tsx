@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Star, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, Star, CheckCircle2, Circle, Edit2, Trash2 } from 'lucide-react';
 import { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -8,12 +8,14 @@ interface TaskCardProps {
   task: Task;
   onToggleComplete: (taskId: string) => void;
   onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({ 
   task, 
   onToggleComplete, 
-  onEdit 
+  onEdit,
+  onDelete 
 }) => {
   const getPriorityClass = (priority: string) => {
     switch (priority) {
@@ -67,9 +69,35 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         </div>
         
-        {task.aiSuggested && (
-          <Star className="h-4 w-4 text-ai-primary" fill="currentColor" />
-        )}
+        <div className="flex items-center gap-2">
+          {task.aiSuggested && (
+            <Star className="h-4 w-4 text-ai-primary" fill="currentColor" />
+          )}
+          
+          <div className="flex items-center gap-1">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-muted"
+                onClick={() => onEdit(task)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => onDelete(task.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
       
       <div className="flex items-center justify-between">

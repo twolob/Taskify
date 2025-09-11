@@ -1,63 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, Search, Filter, MoreHorizontal } from 'lucide-react';
+import { Brain, Search, Filter, Menu } from 'lucide-react';
 import { TaskCard } from '@/components/TaskCard';
 import { TaskStats } from '@/components/TaskStats';
 import { AIInsights } from '@/components/AIInsights';
 import { CreateTaskDialog } from '@/components/CreateTaskDialog';
+import { EditTaskDialog } from '@/components/EditTaskDialog';
+import { AppSidebar } from '@/components/Sidebar';
+import { useTasks } from '@/hooks/useTasks';
 import { Task, AIInsight } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
 import heroImage from '@/assets/hero-dashboard.jpg';
 
 const Index = () => {
   const { toast } = useToast();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, loading, createTask, updateTask, deleteTask, toggleComplete } = useTasks();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [insights, setInsights] = useState<AIInsight[]>([]);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  // Sample data initialization
+  // Sample AI insights initialization
   useEffect(() => {
-    const sampleTasks: Task[] = [
-      {
-        id: '1',
-        title: 'Design landing page mockups',
-        description: 'Create wireframes and high-fidelity designs for the new product landing page',
-        completed: false,
-        priority: 'high',
-        category: 'Design',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        aiSuggested: true
-      },
-      {
-        id: '2',
-        title: 'Implement user authentication',
-        description: 'Set up login/logout functionality with secure session management',
-        completed: true,
-        priority: 'high',
-        category: 'Development',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        aiSuggested: false
-      },
-      {
-        id: '3',
-        title: 'Write project documentation',
-        description: 'Document API endpoints and component usage',
-        completed: false,
-        priority: 'medium',
-        category: 'Documentation',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        aiSuggested: false
-      }
-    ];
-
     const sampleInsights: AIInsight[] = [
       {
         id: '1',
@@ -77,7 +46,6 @@ const Index = () => {
       }
     ];
 
-    setTasks(sampleTasks);
     setInsights(sampleInsights);
   }, []);
 
@@ -92,33 +60,15 @@ const Index = () => {
     return matchesSearch && matchesPriority && matchesCategory;
   });
 
-  const handleToggleComplete = (taskId: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId 
-        ? { ...task, completed: !task.completed, updatedAt: new Date() }
-        : task
-    ));
-    
-    toast({
-      title: "Task updated",
-      description: "Task status has been updated successfully.",
-    });
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditDialogOpen(true);
   };
 
-  const handleCreateTask = (newTaskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTask: Task = {
-      ...newTaskData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setTasks(prev => [newTask, ...prev]);
-    
-    toast({
-      title: "Task created",
-      description: "Your new task has been added successfully.",
-    });
+  const handleDeleteTask = async (taskId: string) => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      await deleteTask(taskId);
+    }
   };
 
   const totalTasks = tasks.length;
@@ -127,7 +77,11 @@ const Index = () => {
   const aiSuggestedTasks = tasks.filter(task => task.aiSuggested).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar />
+        
+        <main className="flex-1 overflow-auto">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -141,24 +95,22 @@ const Index = () => {
         
         <div className="relative max-w-7xl mx-auto px-6 py-12">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
-                AI Task Manager
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Intelligent task management powered by AI insights
-              </p>
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="lg:hidden" />
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
+                  AI Task Manager
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Intelligent task management powered by AI insights
+                </p>
+              </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <CreateTaskDialog 
-                onCreateTask={handleCreateTask}
-                categories={categories}
-              />
-              <Button variant="outline" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
+            <CreateTaskDialog 
+              onCreateTask={createTask}
+              categories={categories}
+            />
           </div>
 
           <TaskStats
@@ -174,7 +126,7 @@ const Index = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Tasks Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">{/* ... keep existing code (filters section) */}
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
@@ -218,7 +170,15 @@ const Index = () => {
 
             {/* Tasks List */}
             <div className="space-y-3">
-              {filteredTasks.length === 0 ? (
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="ai-gradient p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center animate-pulse">
+                    <Brain className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Loading tasks...</h3>
+                  <p className="text-muted-foreground">Please wait while we fetch your tasks.</p>
+                </div>
+              ) : filteredTasks.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="ai-gradient p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                     <Brain className="h-8 w-8 text-white" />
@@ -240,7 +200,9 @@ const Index = () => {
                   >
                     <TaskCard
                       task={task}
-                      onToggleComplete={handleToggleComplete}
+                      onToggleComplete={toggleComplete}
+                      onEdit={handleEditTask}
+                      onDelete={handleDeleteTask}
                     />
                   </div>
                 ))
@@ -254,7 +216,17 @@ const Index = () => {
           </div>
         </div>
       </div>
+        
+      <EditTaskDialog
+        task={editingTask}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUpdateTask={updateTask}
+        categories={categories}
+      />
+    </main>
     </div>
+  </SidebarProvider>
   );
 };
 
