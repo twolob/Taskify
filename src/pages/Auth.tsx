@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { User, Session } from '@supabase/supabase-js';
@@ -12,7 +12,8 @@ import type { User, Session } from '@supabase/supabase-js';
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const [isLogin, setIsLogin] = useState(searchParams.get('mode') !== 'signup');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -168,9 +169,9 @@ const Auth = () => {
 
         <Card className="border border-border/50 shadow-xl bg-card/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-2">
-            <div className="ai-gradient p-3 rounded-xl w-fit mx-auto mb-4">
-              <Brain className="h-8 w-8 text-white" />
-            </div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent mb-4">
+              Taskify
+            </CardTitle>
             <CardTitle className="text-2xl font-bold">
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </CardTitle>

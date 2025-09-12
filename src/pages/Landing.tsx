@@ -67,11 +67,8 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <div className="ai-gradient p-2 rounded-lg">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
-                AI Task Manager
+                Taskify
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -83,7 +80,7 @@ const Landing = () => {
                 Sign In
               </Button>
               <Button 
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/auth?mode=signup')}
                 className="btn-gradient shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Get Started
@@ -118,7 +115,7 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/auth?mode=signup')}
                 className="btn-gradient text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Start Free Trial
@@ -216,9 +213,9 @@ const Landing = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Join thousands of users who have revolutionized their task management with AI
           </p>
-          <Button 
+           <Button 
             size="lg"
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/auth?mode=signup')}
             className="btn-gradient text-lg px-12 py-4 shadow-xl hover:shadow-2xl transition-all duration-300"
           >
             Get Started for Free
@@ -232,15 +229,12 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="ai-gradient p-2 rounded-lg">
-                <Brain className="h-5 w-5 text-white" />
-              </div>
               <span className="text-lg font-bold bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
-                AI Task Manager
+                Taskify
               </span>
             </div>
             <div className="text-muted-foreground text-sm">
-              © 2024 AI Task Manager. All rights reserved.
+              © 2024 Taskify. All rights reserved.
             </div>
           </div>
         </div>

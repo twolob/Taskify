@@ -7,7 +7,8 @@ import { CreateTaskDialog } from '@/components/CreateTaskDialog';
 import { EditTaskDialog } from '@/components/EditTaskDialog';
 import { AppSidebar } from '@/components/Sidebar';
 import { useTasks } from '@/hooks/useTasks';
-import { Task, AIInsight } from '@/types/task';
+import { useAIInsights } from '@/hooks/useAIInsights';
+import { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,35 +22,15 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  // Sample AI insights initialization
-  useEffect(() => {
-    const sampleInsights: AIInsight[] = [
-      {
-        id: '1',
-        type: 'suggestion',
-        title: 'Optimize task prioritization',
-        description: 'Consider moving high-priority design tasks earlier in your workflow for better efficiency.',
-        actionable: true,
-        createdAt: new Date()
-      },
-      {
-        id: '2',
-        type: 'priority',
-        title: 'Deadline approaching',
-        description: 'You have 2 high-priority tasks due within the next 48 hours.',
-        actionable: false,
-        createdAt: new Date()
-      }
-    ];
+  // Dynamic AI insights based on user tasks
+  const insights = useAIInsights(tasks);
 
-    setInsights(sampleInsights);
-  }, []);
-
-  const categories = [...new Set(tasks.map(task => task.category)), 'General'];
+  const predefinedCategories = ['Work', 'Personal', 'Health', 'Finance', 'Learning', 'Shopping', 'Travel', 'General'];
+  const taskCategories = [...new Set(tasks.map(task => task.category))];
+  const categories = [...new Set([...predefinedCategories, ...taskCategories])];
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -99,7 +80,7 @@ const Dashboard = () => {
               <SidebarTrigger className="lg:hidden" />
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
-                  AI Task Manager
+                  Taskify
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   Intelligent task management powered by AI insights

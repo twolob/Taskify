@@ -46,9 +46,6 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="px-4 py-6">
           <div className="flex items-center gap-2">
-            <div className="ai-gradient p-2 rounded-lg">
-              <Brain className="h-6 w-6 text-white" />
-            </div>
             <div>
               <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-ai-primary bg-clip-text text-transparent">
                 Taskify
